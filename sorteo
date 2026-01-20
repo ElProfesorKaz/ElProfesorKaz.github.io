@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo iPhone 16 - Reclamar Premio</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f2f2f7; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; text-align: center; }
+        
+        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; width: 100%; display: none; }
+        
+        h1 { color: #ff3b30; margin-top: 0; }
+        .data-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; font-size: 14px; }
+        .label { font-weight: bold; color: #555; }
+        .value { color: #000; font-family: monospace; }
+        
+        #map { width: 100%; height: 150px; background: #ddd; margin-top: 20px; border-radius: 10px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; color: #666; }
+        
+        .warning { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-top: 20px; font-size: 0.9em; border: 1px solid #ffeeba; }
+    </style>
+</head>
+<body>
+
+    <div id="loading">
+        <div class="loader"></div>
+        <p>Conectando con el servidor...</p>
+    </div>
+
+    <div id="result" class="card">
+        <h1>⚠️ IDENTIDAD EXPUESTA</h1>
+        <p>Acabas de hacer clic en un enlace desconocido. Si esto fuera un ataque real, ya tendría estos datos tuyos:</p>
+        
+        <div class="data-row">
+            <span class="label">Tu IP Pública:</span>
+            <span class="value" id="ip">Cargando...</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Proveedor (ISP):</span>
+            <span class="value" id="isp">Cargando...</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Ciudad:</span>
+            <span class="value" id="city">Cargando...</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Dispositivo:</span>
+            <span class="value" id="device">Detectando...</span>
+        </div>
+        <div class="data-row">
+            <span class="label">Navegador:</span>
+            <span class="value" id="browser">Detectando...</span>
+        </div>
+
+        <div class="warning">
+            <strong>Lección:</strong> Las webs saben quién eres y desde dónde te conectas solo por entrar. Usa una VPN o no hagas clic en enlaces raros.
+        </div>
+    </div>
+
+    <script>
+        // Función para obtener datos reales de la IP
+        async function getVictimData() {
+            try {
+                // Usamos una API gratuita de geolocalización IP
+                let response = await fetch('https://ipapi.co/json/');
+                let data = await response.json();
+
+                document.getElementById('ip').innerText = data.ip;
+                document.getElementById('isp').innerText = data.org;
+                document.getElementById('city').innerText = data.city + ", " + data.region;
+                
+                // Detectar dispositivo básico
+                let ua = navigator.userAgent;
+                let device = "PC / Desconocido";
+                if(ua.includes("iPhone")) device = "Apple iPhone";
+                else if(ua.includes("iPad")) device = "Apple iPad";
+                else if(ua.includes("Android")) device = "Dispositivo Android";
+                
+                document.getElementById('device').innerText = device;
+                document.getElementById('browser').innerText = navigator.appName;
+
+                // Mostrar resultados
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('result').style.display = 'block';
+                }, 1500); // Pequeño retraso para dar tensión
+
+            } catch (error) {
+                console.error("Error al obtener IP", error);
+                document.getElementById('loading').innerHTML = "<p>Error de conexión (¿Tienes AdBlock?). Pero la lección es la misma.</p>";
+            }
+        }
+
+        // Ejecutar al cargar
+        getVictimData();
+    </script>
+</body>
+</html>
